@@ -1,8 +1,3 @@
-<<<<<<< HEAD
-Data/*
-*/.ipynb_checkpoints
 */__pycache__
-=======
 Data/
-*/.ipynb_checkpoints
->>>>>>> 913c836ac75692dd39be639fda5fa9284f6c1f22
+.ipynb_checkpoints
