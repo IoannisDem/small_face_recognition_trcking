@@ -82,11 +82,55 @@ class FaceDataset(data.Dataset):
         return len(self.seq)
 
 
-if __name__ == '__main__':
-    root = '/home/pj00/projects/Github/small_face_recognition_trcking/Data/CASIA/casia-webface/train.rec'
-    embed()
-    dataset = FaceDataset(path_imgrec =root, rand_mirror = False)
-    trainloader = data.DataLoader(dataset, batch_size=32, shuffle=True, num_workers=2, drop_last=False)
-    print(len(dataset))
-    for data, label in trainloader:
-        print(data.shape, label)
+# if __name__ == '__main__':
+#     root = '/home/pj00/projects/Github/small_face_recognition_trcking/Data/CASIA/casia-webface/train.rec'
+#     embed()
+#     dataset = FaceDataset(path_imgrec =root, rand_mirror = False)
+#     trainloader = data.DataLoader(dataset, batch_size=32, shuffle=True, num_workers=2, drop_last=False)
+#     print(len(dataset))
+#     for data, label in trainloader:
+#         print(data.shape, label)
+
+
+class customSubset():
+    def __init__(self, path_imgrec):
+        if path_imgrec:
+            path_imgidx = path_imgrec[0:-4] + ".idx"
+            self.imgrec = recordio.MXIndexedRecordIO(path_imgidx, path_imgrec, 'r')
+            s = self.imgrec.read_idx(0)
+            header, _ = recordio.unpack(s)
+            
+            if header.flag > 0:
+                self.header0 = (int(header.label[0]), int(header.label[1]))
+                self.imgidx = []
+                self.id2range = {}
+                self.seq_identity = range(int(header.label[0]), int(header.label[1]))
+                
+                for identity in self.seq_identity:
+                    s = self.imgrec.read_idx(identity)
+                    header, _ = recordio.unpack(s)
+                    a, b = int(header.label[0]), int(header.label[1])
+                    count = b - a
+                    self.id2range[identity] = (a, b)
+                    self.imgidx += range(a, b)
+            else:
+                self.imgidx = list(self.imgrec.keys)
+            self.seq = self.imgidx
+         
+        self.class_dict = self.generate_idx_dic()
+    
+    def generate_idx_dic(self):
+        idx_dict = {}
+        for index in range(len(self.seq)):
+            idx = self.seq[index]
+            s = self.imgrec.read_idx(idx)
+            header, s = recordio.unpack(s)
+            label = int(header.label)
+            if label in idx_dict.keys():
+                idx_dict[label].append(index)
+            else:
+                idx_dict[label] = [index]
+                
+        return idx_dict
+
+            
