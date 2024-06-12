@@ -5,7 +5,7 @@ from PIL import Image
 import cv2
 import numpy as np
 import time
-
+import os
 
 def model_size(model):
     size_model = 0
@@ -17,14 +17,17 @@ def model_size(model):
     print(f"model size: {size_model} / bit | {size_model / 8e6:.2f} / MB")
 
 
-def detect_crop_image(path, model, transform, device):
-    pil_image = Image.open(path)
-    boxes, _ = mtcnn.detect(pil_image)
+def detect_crop_image(model, transform, device, path=None, frame=None):
+    if path:
+        pil_image = Image.open(path)
+    if isinstance(frame, np.ndarray):
+        pil_image = Image.fromarray(frame)
+    boxes, _ = model.detect(pil_image)
     boxes = boxes.astype(int)
     
     cropped_images = []
     for box in boxes:
-        cropped_image = image.crop(box)
+        cropped_image = pil_image.crop(box)
         cropped_images.append(transform(cropped_image))
     return torch.stack(cropped_images).to(device)
 
@@ -35,13 +38,31 @@ def take_picture(event, x, y, flags, param):
         take_photo = True
         photo_time = time.time()
 
+def next_folder_name(data_path=None):
+    if data_path:
+        folder_list = sorted(os.listdir(data_path),key=lambda x: int(x))
+        if folder_list:
+            return int(folder_list[-1])+1
+        else:
+            return 0
+    else:
+        print('Provide a path')
+
 def extract_face(path=None, save_path=None):
     global take_photo
     
+    next_class = next_folder_name(save_path)
+    save_path = os.path.join(save_path, str(next_class))
+
+    try:
+        os.mkdir(save_path)
+    except:
+        pass
+
     if path:
         image = cv2.imread(path)
         if save_path:
-            cv2.imwrite(save_path, image)
+            cv2.imwrite(os.path.join(save_path, '0.jpg'), image)
         else:
             cv2.imwrite('photo.jpg', image)
         img = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
@@ -62,7 +83,7 @@ def extract_face(path=None, save_path=None):
 
             if take_photo:
                 if save_path:
-                    cv2.imwrite(save_path, frame)
+                    cv2.imwrite(os.path.join(save_path, '0.jpg'), frame)
                 else:
                     cv2.imwrite('photo.jpg', frame)
                 img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
