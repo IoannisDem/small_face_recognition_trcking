@@ -30,6 +30,7 @@ def detect_crop_image(model, transform, device, path=None, frame=None):
         cropped_image = pil_image.crop(box)
         cropped_images.append(transform(cropped_image))
     return torch.stack(cropped_images).to(device)
+    # return cropped_images
 
 # Callback function for mouse events
 def take_picture(event, x, y, flags, param):
