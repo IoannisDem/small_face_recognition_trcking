@@ -81,17 +81,6 @@ class FaceDataset(data.Dataset):
     def __len__(self):
         return len(self.seq)
 
-
-# if __name__ == '__main__':
-#     root = '/home/pj00/projects/Github/small_face_recognition_trcking/Data/CASIA/casia-webface/train.rec'
-#     embed()
-#     dataset = FaceDataset(path_imgrec =root, rand_mirror = False)
-#     trainloader = data.DataLoader(dataset, batch_size=32, shuffle=True, num_workers=2, drop_last=False)
-#     print(len(dataset))
-#     for data, label in trainloader:
-#         print(data.shape, label)
-
-
 class customSubset():
     def __init__(self, path_imgrec):
         if path_imgrec:
