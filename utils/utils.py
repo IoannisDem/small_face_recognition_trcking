@@ -103,4 +103,4 @@ def extract_face(path=None, save_path=None):
         cap.release()
         cv2.destroyAllWindows()
 
-    return img
+    return img, save_path
