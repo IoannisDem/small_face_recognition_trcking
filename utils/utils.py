@@ -6,6 +6,8 @@ import cv2
 import numpy as np
 import time
 import os
+from torchvision.transforms.functional import to_pil_image
+from torch.utils.data import Subset
 
 def model_size(model):
     size_model = 0
@@ -104,3 +106,25 @@ def extract_face(path=None, save_path=None):
         cv2.destroyAllWindows()
 
     return img, save_path
+
+
+def aug_img(save_path, transform, num_images):
+    img = Image.open(save_path)
+    partial_path = '/'.join(save_path.split('/')[:-1])
+    for i in range(num_images-1):
+        new_img = transform(img)
+        new_img.save(os.path.join(partial_path, '{}.jpg'.format(i+1)))
+
+
+def create_neg_class(path, num_images, transforms, dataset, idx_dict):
+    keys = list(idx_dict.keys())
+    
+    for i in range(num_images):
+        key = keys[i]
+                
+        dataset_sub = Subset(dataset, [idx_dict[key][0]])
+        torch_img = dataset_sub.__getitem__(0)[0]
+        pil_img = to_pil_image(torch_img)
+        pil_img = transforms(pil_img)
+#         print(os.path.join(path, '{}.jpg'.format(i)))
+        pil_img.save(os.path.join(path, '{}.jpg'.format(i)))
