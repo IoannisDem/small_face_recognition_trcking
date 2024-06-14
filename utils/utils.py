@@ -24,6 +24,7 @@ def detect_crop_image(model, transform, device, path=None, frame=None):
         pil_image = Image.open(path)
     if isinstance(frame, np.ndarray):
         pil_image = Image.fromarray(frame)
+    
     boxes, _ = model.detect(pil_image)
     boxes = boxes.astype(int)
     
