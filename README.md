@@ -3,6 +3,6 @@ online_face_recognition_and_detection
 
 ToDo:
 - [X] Response-Based Knowledge Distillation
-- [ ] Finetune Original Model
-- [ ] Finetune Distill Model
-- [ ] Performance comparison 
+- [X] Finetune Original Model
+- [X] Finetune Distill Model
+- [X] Performance comparison 
