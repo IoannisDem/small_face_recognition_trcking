@@ -117,15 +117,26 @@ def aug_img(save_path, transform, num_images):
         new_img.save(os.path.join(partial_path, '{}.jpg'.format(i+1)))
 
 
-def create_neg_class(path, num_images, transforms, dataset, idx_dict):
-    keys = list(idx_dict.keys())
-    
-    for i in range(num_images):
-        key = keys[i]
-                
-        dataset_sub = Subset(dataset, [idx_dict[key][0]])
-        torch_img = dataset_sub.__getitem__(0)[0]
-        pil_img = to_pil_image(torch_img)
-        pil_img = transforms(pil_img)
-#         print(os.path.join(path, '{}.jpg'.format(i)))
-        pil_img.save(os.path.join(path, '{}.jpg'.format(i)))
+def create_neg_class(path, num_images, transforms, dataset, idx_dict, key=None):
+    if key:
+        for i in range(num_images):                    
+            dataset_sub = Subset(dataset, [idx_dict[key][0]])
+            torch_img = dataset_sub.__getitem__(0)[0]
+            pil_img = to_pil_image(torch_img)
+            pil_img = transforms(pil_img)
+    #         print(os.path.join(path, '{}.jpg'.format(i)))
+            pil_img.save(os.path.join(path, '{}.jpg'.format(i)))
+
+
+    else:
+        keys = list(idx_dict.keys())
+        
+        for i in range(num_images):
+            key = keys[i]
+                    
+            dataset_sub = Subset(dataset, [idx_dict[key][0]])
+            torch_img = dataset_sub.__getitem__(0)[0]
+            pil_img = to_pil_image(torch_img)
+            pil_img = transforms(pil_img)
+    #         print(os.path.join(path, '{}.jpg'.format(i)))
+            pil_img.save(os.path.join(path, '{}.jpg'.format(i)))
